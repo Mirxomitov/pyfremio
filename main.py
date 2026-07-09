@@ -9,3 +9,7 @@ def home(request, response) -> None:
 @app.route("/about")
 def about(request, response):
     response.text = "Hello from About"
+
+@app.route("/")
+def root(request, response):
+    response.text = "Hello"

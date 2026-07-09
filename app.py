@@ -12,9 +12,9 @@ class PyFremioApp:
     def handle_request(self, request):
         response = Response()
 
-        for path, ketmon in self.routes.items():
+        for path, handler in self.routes.items():
             if path == request.path:
-                ketmon(request, response)
+                handler(request, response)
                 return response
 
         self.default_response(response)
@@ -25,8 +25,8 @@ class PyFremioApp:
         response.text = "Not found"
 
     def route(self, path):
-        def teshavoy(ketmon):
-            self.routes[path] = ketmon
-            return ketmon
+        def wrapper(handler):
+            self.routes[path] = handler
+            return handler
 
-        return teshavoy
+        return wrapper
