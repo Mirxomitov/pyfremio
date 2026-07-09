@@ -1,4 +1,4 @@
-from app import PyFremioApp
+from app2 import PyFremioApp
 
 app = PyFremioApp()
 
@@ -10,6 +10,6 @@ def home(request, response) -> None:
 def about(request, response):
     response.text = "Hello from About"
 
-@app.route("/")
-def root(request, response):
-    response.text = "Hello"
+@app.route("/show/{name}")
+def root(request, response, name):
+    response.text = f"Hello, {name}"
