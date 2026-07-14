@@ -1,4 +1,4 @@
-from app2 import PyFremioApp
+from app import PyFremioApp
 
 app = PyFremioApp()
 
@@ -10,6 +10,14 @@ def home(request, response) -> None:
 def about(request, response):
     response.text = "Hello from About"
 
-@app.route("/show/{name}")
+@app.route("/hello/{name}")
 def root(request, response, name):
     response.text = f"Hello, {name}"
+
+@app.route("/books")
+class Books:
+    def get(self, request, response):
+        response.text = "hello"
+
+    def post(self, request, response):
+        response.text = "Endpoint post books"
