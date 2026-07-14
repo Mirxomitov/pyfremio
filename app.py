@@ -3,6 +3,8 @@ from typing import Any
 from webob import Request, Response
 from parse import parse
 import inspect
+import requests
+import wsgiadapter
 
 class PyFremioApp:
     def __init__(self) -> None:
@@ -19,13 +21,19 @@ class PyFremioApp:
         handler, kwargs = self.find_handler(request.path)
 
         if handler is None:
+            response.status_code = 404
+            response.text = "Not found"
             return response
         
+        if inspect.isclass(handler):
+            handler = getattr(handler(), request.method.lower(), None)
 
-        if kwargs is not None:
-            handler(request, response, **kwargs)
+        if handler is None:
+            response.status_code = 405
+            response.text = "Method not allowed"
+            return response
 
-        handler(request, response)
+        handler(request, response, **kwargs)
 
         return response
     
@@ -47,3 +55,8 @@ class PyFremioApp:
             return handler
         
         return wrapper
+    
+    def test_session(self):
+        session = requests.Session()
+        session.mount('http://testserver', wsgiadapter.WSGIAdapter(self))
+        return session

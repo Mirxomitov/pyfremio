@@ -1,0 +1,65 @@
+import pytest
+from app import PyFremioApp
+
+def test_basic_route_adding(app):
+    @app.route("/home")
+    def home(req, res):
+        res.text = "Hello from home"
+
+def test_duplicate_route(app):
+    @app.route("/home")
+    def home(req, res):
+        res.text = "Hello from home"   
+
+    with pytest.raises(AssertionError):
+        @app.route("/home")
+        def home2(req, res):
+            res.text = "Hello from home"
+    
+def test_requests_can_be_sent_by_test_client(app, test_client):
+    @app.route("/home")
+    def home(req, res):
+        res.text = "Hello from Home"
+
+    response = test_client.get("http://testserver/home")
+    assert response.text == "Hello from Home"
+
+def test_route_with_param(app, test_client):
+    @app.route("/hello/{name}")
+    def hello(req, res, name):
+        res.text = f"Hello {name}"
+
+    assert test_client.get("http://testserver/hello/Tohir").text == "Hello Tohir"
+    assert test_client.get("http://testserver/hello/Jahongir").text == "Hello Jahongir"
+
+def test_default_response (test_client):
+    response = test_client.get("http://testserver/nonexistingpage")
+    assert response.status_code == 404
+    assert response.text == "Not found"
+
+def test_class_based_request_get(app, test_client):
+    @app.route("/books")
+    class Books:
+        def get(self, request, response):
+            response.text = "get books"
+
+    assert test_client.get("http://testserver/books").text == "get books"
+
+def test_class_based_request_post(app, test_client):
+    @app.route("/books")
+    class Books:
+        def post(self, request, response):
+            response.text = "Endpoint post books"
+    
+    assert test_client.post("http://testserver/books").text == "Endpoint post books"
+
+def test_class_based_method_not_allowed(app, test_client):
+    @app.route("/books")
+    class Books:
+        def get(self, request, response):
+            response.text = "get books"
+    
+    response = test_client.post("http://testserver/books")
+    
+    assert response.status_code == 405
+    assert response.text == "Method not allowed"
