@@ -48,13 +48,15 @@ class PyFremioApp:
         
 
     def route(self, path):
-        assert path not in self.routes, f"Duplicate path {path}"
-
         def wrapper(handler):
-            self.routes[path] = handler
+            self.add_route(path, handler)
             return handler
         
         return wrapper
+    
+    def add_route(self, path, handler):
+        assert path not in self.routes, f"Duplicate path {path}"
+        self.routes[path] = handler
     
     def test_session(self):
         session = requests.Session()

@@ -63,3 +63,9 @@ def test_class_based_method_not_allowed(app, test_client):
     
     assert response.status_code == 405
     assert response.text == "Method not allowed"
+
+# def test_alternative_route_adding(app):
+#     def handler(req, res):
+#         res.text = "Alternative route adding"
+
+#     app.add_route("home", handler)
