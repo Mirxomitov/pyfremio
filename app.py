@@ -5,10 +5,15 @@ from parse import parse
 import inspect
 import requests
 import wsgiadapter
+import os
+from jinja2 import FileSystemLoader, Environment
 
 class PyFremioApp:
-    def __init__(self) -> None:
+    def __init__(self, templates_dir="templates") -> None:
         self.routes = {}
+        self.template_env = Environment(
+            loader = FileSystemLoader(os.path.abspath(templates_dir))
+        )
     
     def __call__(self, environ, start_response) -> Any:
         request = Request(environ)
@@ -33,7 +38,7 @@ class PyFremioApp:
             response.text = "Method not allowed"
             return response
 
-        handler(request, response, **kwargs)
+        handler(request, response, **kwargs) # type: ignore
 
         return response
     
@@ -62,3 +67,13 @@ class PyFremioApp:
         session = requests.Session()
         session.mount('http://testserver', wsgiadapter.WSGIAdapter(self))
         return session
+
+    def template(self, template_name, context=None):
+        if context is None:
+            context = {}
+
+        template = self.template_env.get_template(name=template_name).render(**context)
+        return template.encode()
+    
+
+        

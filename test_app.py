@@ -64,8 +64,27 @@ def test_class_based_method_not_allowed(app, test_client):
     assert response.status_code == 405
     assert response.text == "Method not allowed"
 
-# def test_alternative_route_adding(app):
-#     def handler(req, res):
-#         res.text = "Alternative route adding"
+def test_alternative_route_adding(app):
+    def handler(req, res):
+        res.text = "Alternative route adding"
 
-#     app.add_route("home", handler)
+    app.add_route("home", handler)
+
+def test_template_handler(app, test_client):
+    @app.route("/test-template")
+    def test_template(req, res):
+        res.body = app.template(
+            "test.html",
+            context={"new_title": "New Title", "new_body": "New Body"}
+        )
+
+    response = test_client.get("http://testserver/test-template")
+
+    assert "New Title" in response.text
+    assert "New Body" in response.text
+    assert "text/html" in response.headers["Content-Type"]
+
+def test_template_without_context(app):
+    content = app.template("test.html")
+
+    assert isinstance(content, bytes)
