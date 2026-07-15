@@ -88,3 +88,18 @@ def test_template_without_context(app):
     content = app.template("test.html")
 
     assert isinstance(content, bytes)
+
+def test_exception_handler(app, test_client):
+    def on_exception(req, res):
+         res.text= "Something bad happened"
+    
+    app.add_exception_handler(on_exception)
+
+    @app.route("/exception")
+    def exception_throwing(req, res):
+        raise AssertionError("some exception")
+    
+
+    response = test_client.get("http://testserver/exception")
+
+    assert response.text == "Something bad happened"

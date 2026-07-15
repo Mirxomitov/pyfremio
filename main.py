@@ -21,3 +21,10 @@ class Books:
 
     def post(self, request, response):
         response.text = "Endpoint post books"
+
+@app.route("/home-template")
+def home_template(req, res):
+    res.body = app.template(
+        "test.html",
+        context={"new_title": "Tohir's Python Framework", "new_body": "New Body"}
+    )

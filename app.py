@@ -14,6 +14,7 @@ class PyFremioApp:
         self.template_env = Environment(
             loader = FileSystemLoader(os.path.abspath(templates_dir))
         )
+        self.exception_handler = None
     
     def __call__(self, environ, start_response) -> Any:
         request = Request(environ)
@@ -38,7 +39,14 @@ class PyFremioApp:
             response.text = "Method not allowed"
             return response
 
-        handler(request, response, **kwargs) # type: ignore
+        try:
+            handler(request, response, **kwargs) # type: ignore
+        except Exception:
+            if self.exception_handler is None:
+                raise
+
+            response.status_code = 500
+            self.exception_handler(request, response)
 
         return response
     
@@ -75,5 +83,5 @@ class PyFremioApp:
         template = self.template_env.get_template(name=template_name).render(**context)
         return template.encode()
     
-
-        
+    def add_exception_handler(self, handler):
+        self.exception_handler = handler
