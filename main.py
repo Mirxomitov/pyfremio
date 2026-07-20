@@ -3,7 +3,7 @@ from middleware import Middleware
 
 app = PyFremioApp()
 
-@app.route("/home")
+@app.route("/home", allowed_methods=["get"])
 def home(request, response) -> None: 
     response.text = "Hello from Home"
 

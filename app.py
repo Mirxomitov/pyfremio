@@ -8,6 +8,7 @@ import wsgiadapter
 import os
 from jinja2 import FileSystemLoader, Environment
 from whitenoise import WhiteNoise
+from constants import ALL_HTTP_METHODS
 from middleware import Middleware
 
 class PyFremioApp:
@@ -31,23 +32,26 @@ class PyFremioApp:
     def handle_request(self, request):
         response = Response()
 
-        handler, kwargs = self.find_handler(request.path)
+        handler_data, kwargs = self.find_handler(request.path)
 
-        if handler is None:
+        if handler_data is None:
             response.status_code = 404
             response.text = "Not found"
             return response
+
+        handler = handler_data["handler"]
+        allowed_methods = handler_data["allowed_methods"]
         
         if inspect.isclass(handler):
             handler = getattr(handler(), request.method.lower(), None)
 
-        if handler is None:
+        if handler is None or request.method.lower() not in allowed_methods:
             response.status_code = 405
             response.text = "Method not allowed"
             return response
 
         try:
-            handler(request, response, **kwargs) # type: ignore
+            handler(request, response, **kwargs)  # type: ignore
         except Exception:
             if self.exception_handler is None:
                 raise
@@ -58,25 +62,29 @@ class PyFremioApp:
         return response
     
     def find_handler(self, path):
-        for p, handler in self.routes.items():
+        for p, handler_data in self.routes.items():
             parsed_path = parse(p, path)
             
             if parsed_path is not None:
-                return handler, parsed_path.named
+                return handler_data, parsed_path.named
 
         return None, None
         
 
-    def route(self, path):
+    def route(self, path, allowed_methods=[]):
         def wrapper(handler):
-            self.add_route(path, handler)
+            self.add_route(path, handler, allowed_methods)
             return handler
         
         return wrapper
     
-    def add_route(self, path, handler):
+    def add_route(self, path, handler, allowed_methods=[]):
         assert path not in self.routes, f"Duplicate path {path}"
-        self.routes[path] = handler
+        
+        if not allowed_methods:
+            allowed_methods = ALL_HTTP_METHODS
+        
+        self.routes[path] = {"handler" : handler, "allowed_methods": allowed_methods}
     
     def test_session(self):
         session = requests.Session()
@@ -95,8 +103,6 @@ class PyFremioApp:
 
     def add_middleware(self, middleware_cls):
         self.middleware.add(middleware_cls)
-
-
 
 class LoggingMiddleware (Middleware):
     def __init__(self, app):
