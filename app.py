@@ -8,6 +8,7 @@ import wsgiadapter
 import os
 from jinja2 import FileSystemLoader, Environment
 from whitenoise import WhiteNoise
+from middleware import Middleware
 
 class PyFremioApp:
     def __init__(self, templates_dir="templates", static_dir="static") -> None:
@@ -16,8 +17,9 @@ class PyFremioApp:
             loader = FileSystemLoader(os.path.abspath(templates_dir))
         )
         self.exception_handler = None
-        self.whitenoise = WhiteNoise(self.wsgi_app, root=static_dir)
-    
+        self.middleware = LoggingMiddleware(self)
+        self.whitenoise = WhiteNoise(self.middleware, root=static_dir)
+
     def __call__(self, environ, start_response) -> Any:
         return self.whitenoise(environ, start_response)
     
@@ -90,3 +92,18 @@ class PyFremioApp:
     
     def add_exception_handler(self, handler):
         self.exception_handler = handler
+
+    def add_middleware(self, middleware_cls):
+        self.middleware.add(middleware_cls)
+
+
+
+class LoggingMiddleware (Middleware):
+    def __init__(self, app):
+        super().__init__(app)
+    
+    def process_request(self, req):
+        print("request is called ")
+    
+    def process_response(self, req, res):
+        print("response is called")

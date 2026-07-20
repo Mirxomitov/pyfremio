@@ -1,5 +1,5 @@
 import pytest
-from app import PyFremioApp
+from middleware import Middleware
 
 def test_basic_route_adding(app):
     @app.route("/home")
@@ -112,3 +112,31 @@ def test_static_file(test_client):
     response =  test_client.get("http://testserver/test.css")
 
     assert response.text == "body { background-color: chocolate;}"
+
+def test_middleware_processed_request_and_response(app, test_client):
+    is_request_processed = False
+    is_response_processed = False
+    class SimpleMiddleware (Middleware):
+        def __init__(self, app):
+            super().__init__(app)
+        
+        def process_request(self, req):
+            nonlocal is_request_processed
+            is_request_processed = True
+
+        def process_response(self, req, res):
+            nonlocal is_response_processed
+            is_response_processed = True
+
+    app.add_middleware(SimpleMiddleware(app))
+
+    @app.route("/home")
+    def home(req, res):
+        res.text = "home handler"
+    
+    test_client.get("http://testserver/home")
+
+    assert is_request_processed is True
+    assert is_response_processed is True
+
+

@@ -1,4 +1,5 @@
 from app import PyFremioApp
+from middleware import Middleware
 
 app = PyFremioApp()
 
