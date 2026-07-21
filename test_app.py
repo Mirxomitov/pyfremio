@@ -140,3 +140,38 @@ def test_middleware_processed_request_and_response(app, test_client):
     assert is_response_processed is True
 
 
+def test_json_handler(app, test_client):
+    @app.route("/json")
+    def json(req, res):
+        res.json = {"name": "Tohir"}
+
+    response = test_client.get("http://testserver/json")
+    response_data = response.json()
+
+    assert response.headers["Content-Type"] == "application/json"
+    assert response_data["name"] == "Tohir"
+
+
+def test_plain_text_handler(app, test_client):
+    @app.route("/text")
+    def json(req, res):
+        res.text = "text response"
+
+    response = test_client.get("http://testserver/text")
+
+    assert "text/plain" in response.headers["Content-Type"]
+    assert response.text == "text response"
+
+def test_html_handler(app, test_client):
+    @app.route("/html")
+    def json(req, res):
+        res.html = app.template(
+            "test.html",
+            context={"new_title": "New Title", "new_body": "New Body"}
+        )
+
+    response = test_client.get("http://testserver/html")
+
+    assert "text/html" in response.headers["Content-Type"]
+    assert "New Title" in response.text
+    assert "New Body" in response.text

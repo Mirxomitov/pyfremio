@@ -1,6 +1,6 @@
 from typing import Any
 
-from webob import Request, Response
+from webob import Request
 from parse import parse
 import inspect
 import requests
@@ -10,6 +10,7 @@ from jinja2 import FileSystemLoader, Environment
 from whitenoise import WhiteNoise
 from constants import ALL_HTTP_METHODS
 from middleware import Middleware
+from response import Response
 
 class PyFremioApp:
     def __init__(self, templates_dir="templates", static_dir="static") -> None:
