@@ -1,5 +1,5 @@
-from app import PyFremioApp
-from middleware import Middleware
+from pyfremio.app import PyFremioApp
+from pyfremio.middleware import Middleware
 
 app = PyFremioApp()
 

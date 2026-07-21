@@ -8,9 +8,9 @@ import wsgiadapter
 import os
 from jinja2 import FileSystemLoader, Environment
 from whitenoise import WhiteNoise
-from constants import ALL_HTTP_METHODS
-from middleware import Middleware
-from response import Response
+from pyfremio.constants import ALL_HTTP_METHODS
+from pyfremio.middleware import Middleware
+from pyfremio.response import Response
 
 class PyFremioApp:
     def __init__(self, templates_dir="templates", static_dir="static") -> None:

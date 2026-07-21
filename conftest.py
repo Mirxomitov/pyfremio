@@ -1,5 +1,5 @@
 import pytest
-from app import PyFremioApp
+from pyfremio.app import PyFremioApp
 
 @pytest.fixture
 def app():

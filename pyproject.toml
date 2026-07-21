@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyfremio"
+version = "0.1.0"
+description = "A minimal Python WSGI web framework with routing, templates, static files and middleware."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Tohir Mirxomitov" },
+]
+keywords = ["web", "framework", "wsgi", "webob", "http"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
+    "Framework :: WSGI",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+dependencies = [
+    "WebOb>=1.8",
+    "parse>=1.20",
+    "requests>=2.30",
+    "requests-wsgi-adapter>=0.4",
+    "Jinja2>=3.1",
+    "whitenoise>=6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Mirxomitov/pyfremio"
+Repository = "https://github.com/Mirxomitov/pyfremio"
+Issues = "https://github.com/Mirxomitov/pyfremio/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "gunicorn",
+    "build",
+    "twine",
+]
+
+[tool.setuptools]
+packages = ["pyfremio"]
