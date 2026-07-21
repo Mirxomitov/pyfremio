@@ -25,7 +25,11 @@ class Books:
 
 @app.route("/home-template")
 def home_template(req, res):
-    res.body = app.template(
+    res.html = app.template(
         "test.html",
         context={"new_title": "Tohir's Python Framework", "new_body": "New Body"}
     )
+
+@app.route("/json")
+def json(req, res):
+    res.json = {"name": "Pyfremio"}
